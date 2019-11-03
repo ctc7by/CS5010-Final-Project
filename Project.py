@@ -6,7 +6,7 @@ import requests
 import pandas as pd
 import pycountry
 import pycountry_convert
-import folium
+
 
 def connection():
    playersData = pd.DataFrame()
@@ -55,8 +55,13 @@ def connection():
                            'Skill' , 'Weak Foot', 'Work Rate', 'Pace', 'Shooting', 'Passing',
                            'Dribbling' , 'Defending', 'Physicality', 'Height', 'Base Stats',
                            'In Game Stats']
+   
+   playersData.insert(6, "Position Group", playersData['Position'].apply(position), True)
+   playersData.insert(4, "Continent", playersData['Country'].apply(continent) , True)
+   playersData.drop_duplicates(subset = ['Name', 'Overall Rating', 'Position'], keep = 'last', inplace = True) 
+    
    playersData.to_csv('FIFA Player Info.csv')
-    return(pd.read_csv('FIFA Player Info.csv'))
+   return(pd.read_csv('FIFA Player Info.csv'))
         
 def NoneTypeCheck(data, listname, item = None, iterator = None, get = None):
     if data is not None and get is not None:
@@ -74,46 +79,39 @@ def position(DFColumn):
             'Goal Keeper' : ['GK']}
     for position in positions.keys():
         if DFColumn in positions.get(position):
-            print(position)
+            return(position)
         
 def continent(DFColumn):
   countries = {}
   for country in pycountry.countries:
     countries[country.name] = country.alpha_2
-  
-  for country in DFColumn:
-    #print(country)
-    if countries.get(country) is not None:
-      print(pycountry_convert.country_alpha2_to_continent_code(countries.get(country)))
-    elif country == 'Korea Republic':
-      print(pycountry_convert.country_alpha2_to_continent_code('KR'))
-    elif country == 'Korea DPR':
-      print(pycountry_convert.country_alpha2_to_continent_code('KP'))
-    elif country == 'Congo DR':
-      print(pycountry_convert.country_alpha2_to_continent_code('CD'))
-    elif country == 'Cape Verde Islands':
-      print(pycountry_convert.country_alpha2_to_continent_code('CV'))
-    elif country == 'China PR':
-      print(pycountry_convert.country_alpha2_to_continent_code('CN'))
-    elif country == 'Republic of Ireland':
-      print(pycountry_convert.country_alpha2_to_continent_code('IE'))
-    elif country == 'FYR Macedonia':
-      print(pycountry_convert.country_alpha2_to_continent_code('MK'))
-    elif country == 'St. Kitts and Nevis':
-      print(pycountry_convert.country_alpha2_to_continent_code('KN'))
-    elif country == 'São Tomé e Príncipe':
-      print(pycountry_convert.country_alpha2_to_continent_code('ST'))
-    elif country == 'Chinese Taipei':
-      print(pycountry_convert.country_alpha2_to_continent_code('TW'))
-    elif country == 'St. Lucia':
-      print(pycountry_convert.country_alpha2_to_continent_code('LC'))
-    else:
-      return(pycountry_convert.country_alpha2_to_continent_code(pycountry.countries.search_fuzzy(country)[0].alpha_2))
-                          
+
+  if countries.get(DFColumn) is not None:
+      return(pycountry_convert.country_alpha2_to_continent_code(countries.get(DFColumn)))
+  elif DFColumn == 'Korea Republic':
+      return(pycountry_convert.country_alpha2_to_continent_code('KR'))
+  elif DFColumn == 'Korea DPR':
+      return(pycountry_convert.country_alpha2_to_continent_code('KP'))
+  elif DFColumn == 'Congo DR':
+      return(pycountry_convert.country_alpha2_to_continent_code('CD'))
+  elif DFColumn == 'Cape Verde Islands':
+      return(pycountry_convert.country_alpha2_to_continent_code('CV'))
+  elif DFColumn == 'China PR':
+      return(pycountry_convert.country_alpha2_to_continent_code('CN'))
+  elif DFColumn == 'Republic of Ireland':
+      return(pycountry_convert.country_alpha2_to_continent_code('IE'))
+  elif DFColumn == 'FYR Macedonia':
+      return(pycountry_convert.country_alpha2_to_continent_code('MK'))
+  elif DFColumn == 'St. Kitts and Nevis':
+      return(pycountry_convert.country_alpha2_to_continent_code('KN'))
+  elif DFColumn == 'São Tomé e Príncipe':
+      return(pycountry_convert.country_alpha2_to_continent_code('ST'))
+  elif DFColumn == 'Chinese Taipei':
+      return(pycountry_convert.country_alpha2_to_continent_code('TW'))
+  elif DFColumn == 'St. Lucia':
+      return(pycountry_convert.country_alpha2_to_continent_code('LC'))
+  else:
+      return(pycountry_convert.country_alpha2_to_continent_code(pycountry.countries.search_fuzzy(DFColumn)[0].alpha_2))
+                   
 if __name__ == '__main__':
     DF = connection()
-    DF.insert(6, "Position Group", DF['Position'].apply(position), True)
-    DF.insert(4, "Continent", DF['Country'].apply(continent) , True)
-    #print(continent())
-    #print(DF['Continent'])
-
